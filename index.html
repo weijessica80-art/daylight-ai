@@ -70,4 +70,16 @@ function daylightNeedsDates(){return '<section class="card"><h2>Registration dat
 const daylightSchoolRender=render;
 render=function(){daylightSchoolRender();if(tab==='Today'||tab==='Calendar'||tab==='School'){document.getElementById('main')?.insertAdjacentHTML('beforeend',daylightNeedsDates())}};
 render();
+</script><style>.upcoming-alerts{border:1px solid #c8bdf1;background:#f9f7ff}.alert-row{padding:9px 0;border-bottom:1px solid #e6dff6}.alert-row:last-child{border:0}.alert-row strong{display:block;font-size:13px}.alert-row small{color:#6e6588}.alert-chip{font-size:11px;color:#6250a2;font-weight:700}</style><script>
+const daylightAlertSeedKey='daylight_alert_seed_v1';
+if(!localStorage.getItem(daylightAlertSeedKey)){const confirmed=[
+['intl-open-house-2026','INTL Preschool–Grade 5 Open House','2026-12-05T09:30','School','Confirmed registration, 9:30 AM'],
+['pinewood-open-house-2026','Pinewood Lower Campus Open House','2026-11-14T09:00','School','Confirmed, 9:00–10:30 AM'],
+['pinewood-tour-2026','Pinewood Lower Campus Tour','2026-11-17T09:00','School','Confirmed, 9:00 AM'],
+['keys-open-house-2026','Keys Lower School Open House','2026-11-07T09:00','School','Past confirmed event, 9:00–11:00 AM'],
+['trinity-tour-2026','Trinity School campus tour','2026-10-15T09:00','School','Past confirmed event, 9:00–10:00 AM'],
+['khan-lab-tour-2026','Khan Lab School Lower School Tour','2026-11-04T09:00','School','Past confirmed event, 9:00–10:30 AM']
+];confirmed.forEach(([id,title,due,category,schoolNote])=>{let t=state.tasks.find(x=>x.title.toLowerCase()===title.toLowerCase()&&x.due?.slice(0,10)===due.slice(0,10));if(t){t.due=due;t.schoolDateOnly=false;t.schoolNote=schoolNote}else state.tasks.push({id,title,due,category,schoolNote,done:false})});save();localStorage.setItem(daylightAlertSeedKey,'yes')}
+function daylightAlertsHtml(){let now=Date.now(),items=state.tasks.filter(t=>!t.done&&t.due&&t.due.includes('T')&&!t.schoolDateOnly&&!daylightSuperseded(t)).map(t=>({t,ms:new Date(t.due).getTime()-now})).filter(x=>x.ms>0&&x.ms<=7*86400000).sort((a,b)=>a.ms-b.ms);if(!items.length)return '';return '<section class="card upcoming-alerts"><h2>🔔 Upcoming appointment reminders</h2><p class="muted">Daylight AI shows alerts here starting 7 days before an event. Phone push alerts are not enabled.</p>'+items.map(({t,ms})=>'<div class="alert-row"><strong>'+esc(t.title)+'</strong><small>'+esc(fmt(t.due))+' · '+esc(t.schoolNote||'')+'</small><div class="alert-chip">'+(ms<=3600000?'Starts within 1 hour':ms<=86400000?'Within 24 hours':'Upcoming in '+Math.ceil(ms/86400000)+' days')+'</div></div>').join('')+'</section>'}
+const daylightAlertsRender=render;render=function(){daylightAlertsRender();if(tab==='Today'||tab==='Calendar'){let html=daylightAlertsHtml();if(html)document.getElementById('main')?.insertAdjacentHTML('beforeend',html)}};render();
 </script></body></html>
