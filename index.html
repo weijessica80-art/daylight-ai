@@ -57,4 +57,17 @@ function daylightOverdueCard(){let missed=state.tasks.filter(daylightOverdue).so
 const daylightPreviousRender=render;
 render=function(){daylightPreviousRender();if(tab==='Today'||tab==='Tasks'){let main=document.getElementById('main');if(main){let holder=document.createElement('div');holder.innerHTML=daylightOverdueCard();if(holder.firstElementChild){let first=main.querySelector('.card');if(first)first.after(holder.firstElementChild);else main.prepend(holder.firstElementChild)}}}if(tab==='Calendar'){let main=document.getElementById('main');let card=daylightOverdueCard();if(card)main.insertAdjacentHTML('beforeend',card)}};
 render();
+</script><style>.daylight-action-needed{border:1px solid #efc994;background:#fffaf0;border-radius:13px;padding:12px;margin:8px 0}.daylight-action-needed strong{color:#8d5818}.daylight-action-needed p{font-size:12px;color:#795f3b;margin:5px 0}</style><script>
+const daylightExtraEvents=[
+['pinewood-open-house-2026','Pinewood Lower Campus Open House','2026-11-14T09:00','School','Confirmed 9:00–10:30 AM · Lower Campus, 477 Fremont Ave, Los Altos'],
+['pinewood-tour-2026','Pinewood Lower Campus Tour','2026-11-17T09:00','School','Confirmed 9:00 AM · Lower Campus, 477 Fremont Ave, Los Altos'],
+['keys-open-house-2026','Keys Lower School Open House','2026-11-07T09:00','School','Past confirmed event, 9:00–11:00 AM'],
+['trinity-tour-time-2026','Trinity School campus tour','2026-10-15T09:00','School','Past confirmed tour, 9:00–10:00 AM']
+];
+const daylightExtraSeedKey='daylight_extra_events_v1';
+if(!localStorage.getItem(daylightExtraSeedKey)){daylightExtraEvents.forEach(([id,title,due,category,schoolNote])=>{let existing=state.tasks.find(t=>t.title.toLowerCase()===title.toLowerCase()&&t.due?.slice(0,10)===due.slice(0,10));if(existing){existing.due=due;existing.schoolDateOnly=false;existing.schoolNote=schoolNote}else state.tasks.push({id,title,due,category,done:false,schoolNote})});save();localStorage.setItem(daylightExtraSeedKey,'yes')}
+function daylightNeedsDates(){return '<section class="card"><h2>Registration dates to confirm</h2><div class="daylight-action-needed"><strong>Sacred Heart — tour / admissions appointment</strong><p>No confirmed date or time found yet. Check the admissions portal.</p><a href="https://www.ravenna-hub.com/" target="_blank" rel="noopener noreferrer">Check admissions ↗</a></div><div class="daylight-action-needed"><strong>YMCA — next children’s swim registration</strong><p>Next opening date and time not yet confirmed. Registration announcements are being monitored separately in ChatGPT.</p><a href="https://www.ymcasv.org/" target="_blank" rel="noopener noreferrer">YMCA website ↗</a></div></section>'}
+const daylightSchoolRender=render;
+render=function(){daylightSchoolRender();if(tab==='Today'||tab==='Calendar'||tab==='School'){document.getElementById('main')?.insertAdjacentHTML('beforeend',daylightNeedsDates())}};
+render();
 </script></body></html>
